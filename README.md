@@ -1,8 +1,8 @@
 # pptx-sweep
 
-> ⚠ **Work in progress**, not ready for production use.
-
 A utility to remove artifacts from PowerPoint files, such as comments, notes, and metadata.
+
+[![npm version](https://badge.fury.io/js/pptx-sweep.svg)](https://badge.fury.io/js/pptx-sweep)
 
 ## How to use
 
