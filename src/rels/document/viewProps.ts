@@ -25,8 +25,6 @@ export async function modifyViewProps(
 
     zip.file(referencingRelsPath, updatedReferencingRelsFileContent);
 
-    console.log(updatedReferencingRelsFileContent);
-
     zip.remove(viewPropsPath);
   }
 }

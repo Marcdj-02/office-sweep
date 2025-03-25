@@ -39,6 +39,9 @@ export type SweepOptions = {
     notes?: boolean;
     authors?: boolean;
     view?: boolean;
+    image?: {
+      metadata?: boolean;
+    };
   };
 };
 

@@ -5,6 +5,7 @@ import { getFileJson } from "../../utils/xml";
 import { modifyNotesSlide } from "./slide/notesSlide";
 import { modifyModernComments } from "./slide/comments/modernComments";
 import { modifyLegacyComments } from "./slide/comments/legacyComments";
+import { modifyImage } from "./slide/image";
 
 const relationshipTypes: Record<
   string,
@@ -17,7 +18,7 @@ const relationshipTypes: Record<
   | undefined
 > = {
   "http://schemas.openxmlformats.org/officeDocument/2006/relationships/image":
-    undefined,
+    modifyImage,
   "http://schemas.microsoft.com/office/2018/10/relationships/comments":
     modifyModernComments,
   "http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments":
