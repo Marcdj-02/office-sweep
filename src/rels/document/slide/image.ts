@@ -1,7 +1,6 @@
 import JSZip from "jszip";
 import { SweepOptions } from "../../..";
 import path from "path";
-import { ExifTool } from "exiftool-vendored";
 import { PNG } from "pngjs";
 import jpeg from "jpeg-js";
 
@@ -21,12 +20,14 @@ export async function modifyImage(
   }
 
   const extension = path.extname(imagePath).toLowerCase();
-  console.log(`Image extension: ${extension}`);
 
   switch (extension) {
     case ".jpg":
     case ".jpeg":
-      const jpegImageData = jpeg.decode(imageData);
+      const jpegImageData = jpeg.decode(imageData, {
+        maxResolutionInMP: 1000000,
+        maxMemoryUsageInMB: 1000000,
+      });
       if (!jpegImageData) {
         throw new Error(`Failed to decode JPEG image: ${imagePath}`);
       }

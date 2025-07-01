@@ -1,5 +1,5 @@
 // import { sweep } from "./dist/index.js";
-const { pptxSweep } = require("./dist/index.js");
+const { pptxSweep } = require("../dist/index.js");
 const fs = require("fs");
 
 // Read powerpoint directory for files names
@@ -23,6 +23,9 @@ for (let i = 0; i < files.length; i++) {
       comments: {
         modern: true,
         legacy: true,
+      },
+      image: {
+        metadata: true,
       },
       authors: true,
       view: true,
