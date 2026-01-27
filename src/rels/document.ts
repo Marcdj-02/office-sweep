@@ -12,10 +12,8 @@ import { modifyPresProps } from "./document/presProps";
 import { modifyHandoutMaster } from "./document/handoutMaster";
 import { modifyAuthors } from "./document/authors";
 import { modifyCommentAuthors } from "./document/commentAuthors";
-
-async function todoOverwrite(zip: JSZip, path: string, options: SweepOptions) {
-  throw new Error("TODO: Overwrite the file");
-}
+import { ModifyReturn, Image } from "../types";
+import fs from "fs";
 
 const relationshipTypes: Record<
   string,
@@ -24,7 +22,7 @@ const relationshipTypes: Record<
     referencingRelsPath: string,
     path: string,
     options: SweepOptions
-  ) => Promise<void>
+  ) => Promise<ModifyReturn | void>
 > = {
   "http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide":
     modifySlide,
@@ -52,7 +50,13 @@ export async function modifyDocument(
   zip: JSZip,
   documentPath: string,
   options: SweepOptions
-): Promise<void> {
+): Promise<ModifyReturn> {
+  const json = await getFileJson(zip, documentPath);
+
+  const slideIdList = json["p:presentation"]["p:sldIdLst"]["p:sldId"].map(
+    (s: any) => s["_attributes"]["r:id"]
+  );
+
   const relsPath = getRelsPath(documentPath);
 
   const rels = await getFileJson(zip, relsPath);
@@ -60,16 +64,37 @@ export async function modifyDocument(
   const relationships: { Id: string; Type: string; Target: string }[] =
     rels.Relationships.Relationship.map((r: any) => r._attributes);
 
+  let images: Image[] = [];
+
   for (const relationship of relationships) {
     const modifyFunction = relationshipTypes[relationship.Type];
 
     if (modifyFunction) {
-      await modifyFunction(
+      const slideIndex = slideIdList.findIndex(
+        (id: string) => id === relationship.Id
+      );
+
+      const result = await modifyFunction(
         zip,
         relsPath,
         `ppt/${relationship.Target}`,
         options
       );
+
+      if (result) {
+        for (const image of result.images) {
+          const existingImage = images.find(
+            (i: Image) => i.internalPath === image.internalPath
+          );
+          if (existingImage) {
+            existingImage.slideIndexes.push(slideIndex);
+          } else {
+            images.push({ ...image, slideIndexes: [slideIndex] });
+          }
+        }
+      }
     }
   }
+
+  return { images };
 }

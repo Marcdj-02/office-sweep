@@ -1,5 +1,6 @@
 import JSZip from "jszip";
 import { SweepOptions } from "..";
+import { ModifyReturn } from "../types";
 
 const removalPatterns: Record<
   keyof NonNullable<NonNullable<SweepOptions["remove"]>["core"]>,

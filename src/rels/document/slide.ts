@@ -6,6 +6,7 @@ import { modifyNotesSlide } from "./slide/notesSlide";
 import { modifyModernComments } from "./slide/comments/modernComments";
 import { modifyLegacyComments } from "./slide/comments/legacyComments";
 import { modifyImage } from "./slide/image";
+import { ModifyReturn, Image } from "../../types";
 
 const relationshipTypes: Record<
   string,
@@ -14,7 +15,7 @@ const relationshipTypes: Record<
       referencingRelsPath: string,
       path: string,
       options: SweepOptions
-    ) => Promise<void>)
+    ) => Promise<ModifyReturn | void>)
   | undefined
 > = {
   "http://schemas.openxmlformats.org/officeDocument/2006/relationships/image":
@@ -34,7 +35,7 @@ export async function modifySlide(
   referencingRelsPath: string,
   slidePath: string,
   options: SweepOptions
-): Promise<void> {
+): Promise<ModifyReturn> {
   const relsPath = getRelsPath(slidePath);
 
   const rels = await getFileJson(zip, relsPath);
@@ -44,16 +45,22 @@ export async function modifySlide(
       ? rels.Relationships.Relationship.map((r: any) => r._attributes)
       : [rels.Relationships.Relationship._attributes];
 
+  let images: Image[] = [];
+
   for (const relationship of relationships) {
     const modifyFunction = relationshipTypes[relationship.Type];
 
     if (modifyFunction) {
-      await modifyFunction(
+      const result = await modifyFunction(
         zip,
         relsPath,
         addRelativePath(slidePath, relationship.Target),
         options
       );
+
+      if (result) {
+        images = [...images, ...result.images];
+      }
     }
   }
 
@@ -70,4 +77,6 @@ export async function modifySlide(
 
     zip.file(slidePath, updatedSlideContent);
   }
+
+  return { images };
 }

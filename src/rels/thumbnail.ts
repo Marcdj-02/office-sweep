@@ -1,5 +1,6 @@
 import JSZip from "jszip";
 import { SweepOptions } from "..";
+import { ModifyReturn } from "../types";
 
 export async function modifyThumbnail(
   zip: JSZip,
