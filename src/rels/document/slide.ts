@@ -48,6 +48,10 @@ export async function modifySlide(
   let images: Image[] = [];
 
   for (const relationship of relationships) {
+    if (relationship.Target === "NULL"){
+      continue;
+    }
+    
     const modifyFunction = relationshipTypes[relationship.Type];
 
     if (modifyFunction) {
