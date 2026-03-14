@@ -154,9 +154,11 @@ When using `extract`, returns:
 
 | Format | Remove metadata | Extract images |
 | ------ | :-------------: | :------------: |
-| `.pptx` | ✅ | ✅ |
-| `.docx` | ✅ | — |
-| `.xlsx` | 🔜 Planned | 🔜 Planned |
+| `.ppt` / `.pptx` | ✅ | ✅ |
+| `.doc` / `.docx` | ⚠️* | ✅ |
+| `.xls` / `.xlsx` | ❌ | ❌ |
+
+\* = Comments only
 
 ## Use cases
 
