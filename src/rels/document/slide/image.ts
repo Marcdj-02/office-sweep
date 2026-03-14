@@ -1,5 +1,5 @@
 import JSZip from "jszip";
-import { SweepOptions } from "../../..";
+import { SweepOptions } from "../../../office";
 import path from "path";
 import { PNG } from "pngjs";
 import jpeg from "jpeg-js";
@@ -18,7 +18,7 @@ export async function modifyImage(
 
   const extension = path.extname(imagePath).toLowerCase();
 
-  if (options.remove?.image?.metadata) {
+  if (options.remove?.ppt?.image?.metadata) {
     switch (extension) {
       case ".jpg":
       case ".jpeg":

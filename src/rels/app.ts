@@ -1,5 +1,5 @@
 import JSZip from "jszip";
-import { SweepOptions } from "..";
+import { SweepOptions } from "../office";
 
 export async function modifyExtendedProperties(
   zip: JSZip,
@@ -11,11 +11,11 @@ export async function modifyExtendedProperties(
     throw new Error(`File not found: ${extendedPath}`);
   }
 
-  if (options.remove?.notes) {
+  if (options.remove?.ppt?.notes) {
     extended = extended.replace(/<Notes>\d+?<\/Notes>/, "<Notes>0</Notes>");
   }
 
-  if (options.remove?.totalTime) {
+  if (options.remove?.ppt?.totalTime) {
     extended = extended.replace(/<TotalTime>\d+?<\/TotalTime>/, "");
   }
 

@@ -1,16 +1,25 @@
 // import { sweep } from "./dist/index.js";
-const { pptxSweep } = require("../dist/index.js");
+const { pptxSweep } = require("../../dist/index.js");
 const fs = require("fs");
 
+const inputFolder = "./input";
+const outputFolder = "./output/removed";
+
+if (fs.existsSync(outputFolder)) {
+  fs.rmSync(outputFolder, { recursive: true });
+}
+
+fs.mkdirSync(outputFolder);
+
 // Read powerpoint directory for files names
-const files = fs.readdirSync("./powerpoints");
+const files = fs.readdirSync(inputFolder);
 
 for (let i = 0; i < files.length; i++) {
   const file = files[i];
-  const output = file.replace(".pptx", "-swept2.pptx");
 
-  pptxSweep(`./powerpoints/${file}`, `./powerpoints-swept/${output}`, {
+  pptxSweep(`${inputFolder}/${file}`, {
     remove: {
+      destinationFilePath: `${outputFolder}/${file}`,
       core: {
         title: true,
         creator: true,

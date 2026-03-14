@@ -1,9 +1,9 @@
 import JSZip from "jszip";
-import { SweepOptions } from "..";
+import { SweepOptions } from "../office";
 import { ModifyReturn } from "../types";
 
 const removalPatterns: Record<
-  keyof NonNullable<NonNullable<SweepOptions["remove"]>["core"]>,
+  keyof NonNullable<NonNullable<NonNullable<SweepOptions["remove"]>["ppt"]>["core"]>,
   | {
       action: "remove";
       pattern: string;
@@ -50,11 +50,11 @@ export async function modifyCoreProperties(
     throw new Error(`File not found: ${corePath}`);
   }
 
-  if (options.remove?.core) {
-    for (const key of Object.keys(options.remove.core)) {
-      const castedKey = key as keyof typeof options.remove.core;
+  if (options.remove?.ppt?.core) {
+    for (const key of Object.keys(options.remove.ppt.core)) {
+      const castedKey = key as keyof typeof options.remove.ppt.core;
 
-      if (options.remove.core[castedKey]) {
+      if (options.remove.ppt.core[castedKey]) {
         const config = removalPatterns[castedKey];
         if (!config) {
           throw new Error(`Unknown key: ${castedKey}`);

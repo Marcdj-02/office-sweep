@@ -1,5 +1,5 @@
 import JSZip from "jszip";
-import { SweepOptions } from "../..";
+import { SweepOptions } from "../../office";
 
 export async function modifyViewProps(
   zip: JSZip,
@@ -7,7 +7,7 @@ export async function modifyViewProps(
   viewPropsPath: string,
   options: SweepOptions
 ): Promise<void> {
-  if (options.remove?.view) {
+  if (options.remove?.ppt?.view) {
     const referencingRelsFileContent = await zip
       .file(referencingRelsPath)
       ?.async("text");

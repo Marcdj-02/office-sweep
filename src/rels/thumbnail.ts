@@ -1,5 +1,5 @@
 import JSZip from "jszip";
-import { SweepOptions } from "..";
+import { SweepOptions } from "../office";
 import { ModifyReturn } from "../types";
 
 export async function modifyThumbnail(
@@ -7,7 +7,7 @@ export async function modifyThumbnail(
   thumbnailPath: string,
   options: SweepOptions
 ): Promise<void> {
-  if (options.remove?.thumbnail) {
+  if (options.remove?.ppt?.thumbnail) {
     // 1. Remove the thumbnail file
     zip.remove(thumbnailPath);
 

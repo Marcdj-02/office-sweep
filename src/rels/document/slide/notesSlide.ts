@@ -1,5 +1,5 @@
 import JSZip from "jszip";
-import { SweepOptions } from "../../..";
+import { SweepOptions } from "../../../office";
 import { getRelsPath } from "../../../utils/paths";
 
 export async function modifyNotesSlide(
@@ -8,7 +8,9 @@ export async function modifyNotesSlide(
   notesSlidePath: string,
   options: SweepOptions
 ): Promise<void> {
-  if (!options.remove?.notes) return;
+  if (!options.remove?.ppt?.notes) {
+    return;
+  }
 
   let referencingRelsPathFileContent = await zip
     .file(referencingRelsPath)

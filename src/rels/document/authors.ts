@@ -1,5 +1,5 @@
 import JSZip from "jszip";
-import { SweepOptions } from "../..";
+import { SweepOptions } from "../../office";
 
 export async function modifyAuthors(
   zip: JSZip,
@@ -7,7 +7,7 @@ export async function modifyAuthors(
   authorsPath: string,
   options: SweepOptions
 ): Promise<void> {
-  if (options.remove?.authors) {
+  if (options.remove?.ppt?.authors) {
     const referencingRelsFileContent = await zip
       .file(referencingRelsPath)
       ?.async("text");

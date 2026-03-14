@@ -1,5 +1,5 @@
 import JSZip from "jszip";
-import { SweepOptions } from "../../../..";
+import { SweepOptions } from "../../../../office";
 import { getRelsPath } from "../../../../utils/paths";
 
 export async function modifyModernComments(
@@ -8,7 +8,12 @@ export async function modifyModernComments(
   commentPath: string,
   options: SweepOptions
 ): Promise<void> {
-  if (!options.remove?.comments?.modern) return;
+  if (
+    !options.remove?.ppt?.comments?.modern &&
+    !options.remove?.word?.comments
+  ) {
+    return;
+  }
 
   let referencingRelsPathFileContent = await zip
     .file(referencingRelsPath)

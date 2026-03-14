@@ -131,6 +131,9 @@ dist
 
 # Custom
 reference/*
+*.ppt
 *.pptx
+*.doc
+*.docx
 *.zip
-powerpoints-unzipped/
+tests/*/output/*

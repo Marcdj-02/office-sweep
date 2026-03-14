@@ -1,18 +1,27 @@
 {
-  "name": "pptx-sweep",
+  "name": "office-sweep",
   "license": "MIT",
-  "version": "2.0.1",
+  "version": "3.0.1",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Marcdj-02/pptx-sweep.git"
+    "url": "https://github.com/Marcdj-02/office-sweep.git"
   },
   "files": [
     "dist"
   ],
   "keywords": [
+    "officesweep",
+    "office sweep",
+    "office sweeper",
+    "office",
+    "sweep",
+    "office cleaner",
+    "office metadata",
+    "office comments",
+    "office notes",
     "pptxsweep",
     "pptx sweep",
     "pptx sweeper",
@@ -23,7 +32,16 @@
     "powerpoint cleaner",
     "powerpoint metadata",
     "pptx comments",
-    "pptx notes"
+    "pptx notes",
+    "docxsweep",
+    "docx sweep",
+    "docx sweeper",
+    "docx",
+    "sweep",
+    "docx cleaner",
+    "docx metadata",
+    "docx comments",
+    "docx notes"
   ],
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts",

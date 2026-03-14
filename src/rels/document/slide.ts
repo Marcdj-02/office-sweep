@@ -1,5 +1,5 @@
 import JSZip from "jszip";
-import { SweepOptions } from "../..";
+import { SweepOptions } from "../../office";
 import { addRelativePath, getRelsPath } from "../../utils/paths";
 import { getFileJson } from "../../utils/xml";
 import { modifyNotesSlide } from "./slide/notesSlide";
@@ -68,18 +68,21 @@ export async function modifySlide(
     }
   }
 
-  if (options.remove?.comments) {
-    const slideContent = await zip.file(slidePath)?.async("string");
+  if (options.remove?.ppt?.comments) {
+    let slideContent = await zip.file(slidePath)?.async("string");
     if (!slideContent) {
       throw new Error(`File not found: ${slidePath}`);
     }
 
-    const updatedSlideContent = slideContent.replace(
+    const replacePatterns = [
       /<p188:commentRel[^>]*?\/>/,
-      ""
-    );
+    ];
 
-    zip.file(slidePath, updatedSlideContent);
+    for (const pattern of replacePatterns) {
+      slideContent = slideContent.replace(pattern, "");
+    }
+
+    zip.file(slidePath, slideContent);
   }
 
   return { images };

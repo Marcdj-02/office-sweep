@@ -1,49 +1,52 @@
 import JSZip from "jszip";
-import { SweepOptions } from "..";
+import { SweepOptions } from "../office";
+import { Image, ModifyReturn } from "../types";
 import { getRelsPath } from "../utils/paths";
 import { getFileJson } from "../utils/xml";
-import { modifySlide } from "./document/slide";
-import { modifyNotesMaster } from "./document/notesMaster";
-import { modifyTableStyles } from "./document/tableStyles";
-import { modifyTheme } from "./document/theme";
-import { modifyViewProps } from "./document/viewProps";
-import { modifySlideMaster } from "./document/slideMaster";
-import { modifyPresProps } from "./document/presProps";
-import { modifyHandoutMaster } from "./document/handoutMaster";
 import { modifyAuthors } from "./document/authors";
 import { modifyCommentAuthors } from "./document/commentAuthors";
-import { ModifyReturn, Image } from "../types";
-import fs from "fs";
+import { modifySlide } from "./document/slide";
+import { modifyLegacyComments } from "./document/slide/comments/legacyComments";
+import { modifyImage } from "./document/slide/image";
+import { modifyViewProps } from "./document/viewProps";
 
 const relationshipTypes: Record<
   string,
-  (
+  ((
     zip: JSZip,
     referencingRelsPath: string,
     path: string,
     options: SweepOptions
-  ) => Promise<ModifyReturn | void>
+  ) => Promise<ModifyReturn | void>) | null
 > = {
   "http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide":
     modifySlide,
   "http://schemas.openxmlformats.org/officeDocument/2006/relationships/notesMaster":
-    modifyNotesMaster,
+    null,
   "http://schemas.openxmlformats.org/officeDocument/2006/relationships/tableStyles":
-    modifyTableStyles,
+    null,
   "http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme":
-    modifyTheme,
+    null,
   "http://schemas.openxmlformats.org/officeDocument/2006/relationships/viewProps":
     modifyViewProps,
   "http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideMaster":
-    modifySlideMaster,
+    null,
   "http://schemas.openxmlformats.org/officeDocument/2006/relationships/presProps":
-    modifyPresProps,
+    null,
   "http://schemas.microsoft.com/office/2018/10/relationships/authors":
     modifyAuthors,
   "http://schemas.openxmlformats.org/officeDocument/2006/relationships/handoutMaster":
-    modifyHandoutMaster,
+    null,
   "http://schemas.openxmlformats.org/officeDocument/2006/relationships/commentAuthors":
     modifyCommentAuthors,
+  "http://schemas.openxmlformats.org/officeDocument/2006/relationships/image":
+    modifyImage,
+  "http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments":
+    modifyLegacyComments,
+  "http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings": null,
+  "http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable": null,
+  "http://schemas.openxmlformats.org/officeDocument/2006/relationships/numbering": null,
+  "http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles": null,
 };
 
 export async function modifyDocument(
@@ -53,9 +56,18 @@ export async function modifyDocument(
 ): Promise<ModifyReturn> {
   const json = await getFileJson(zip, documentPath);
 
-  const slideIdList = json["p:presentation"]["p:sldIdLst"]["p:sldId"].map(
-    (s: any) => s["_attributes"]["r:id"]
-  );
+  const documentType = (() => {
+    if (documentPath.includes("presentation.xml")) return "ppt";
+    return "word";
+  })()
+
+  const slideIdList = (() => {
+    if (documentType !== 'ppt') return [];
+
+    return json["p:presentation"]["p:sldIdLst"]["p:sldId"].map(
+      (s: any) => s["_attributes"]["r:id"]
+    )
+  })()
 
   const relsPath = getRelsPath(documentPath);
 
@@ -77,7 +89,7 @@ export async function modifyDocument(
       const result = await modifyFunction(
         zip,
         relsPath,
-        `ppt/${relationship.Target}`,
+        `${documentType}/${relationship.Target}`,
         options
       );
 
@@ -87,13 +99,44 @@ export async function modifyDocument(
             (i: Image) => i.internalPath === image.internalPath
           );
           if (existingImage) {
+            if (slideIndex === -1) {
+              continue;
+            }
+
             existingImage.slideIndexes.push(slideIndex);
           } else {
-            images.push({ ...image, slideIndexes: [slideIndex] });
+            const newImage = slideIndex === -1 ? image : { ...image, slideIndexes: [slideIndex] };
+            
+            images.push(newImage);
           }
         }
       }
     }
+  }
+
+  if (options.remove?.word?.comments) {
+    if (documentType !== 'word') {
+      throw new Error("Cannot remove word comments on non-word document");
+    }
+
+    let documentContent = await zip.file(documentPath)?.async("string");
+    if (!documentContent) {
+      throw new Error(`File not found: ${documentPath}`);
+    }
+
+    const replacePatterns = [
+      /<w:commentRangeStart[^>]*?\/>/,
+      /<w:commentRangeEnd[^>]*?\/>/,
+      /<w:commentReference[^>]*?\/>/,
+    ];
+
+    for (const pattern of replacePatterns) {
+      documentContent = documentContent.replace(pattern, "");
+    }
+
+    console.log(documentContent);
+
+    zip.file(documentPath, documentContent);
   }
 
   return { images };
